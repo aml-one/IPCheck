@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.3.32819.101
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IPCheck", "IPCheck\IPCheck.csproj", "{86CB680A-2F9A-4AEE-B644-AC1A1F0A5E02}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServiceInstaller", "updater\ServiceInstaller.csproj", "{C8D1C1F5-1F9B-4FC3-A323-45CF2A951D34}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{86CB680A-2F9A-4AEE-B644-AC1A1F0A5E02}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{86CB680A-2F9A-4AEE-B644-AC1A1F0A5E02}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{86CB680A-2F9A-4AEE-B644-AC1A1F0A5E02}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{86CB680A-2F9A-4AEE-B644-AC1A1F0A5E02}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C8D1C1F5-1F9B-4FC3-A323-45CF2A951D34}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C8D1C1F5-1F9B-4FC3-A323-45CF2A951D34}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C8D1C1F5-1F9B-4FC3-A323-45CF2A951D34}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C8D1C1F5-1F9B-4FC3-A323-45CF2A951D34}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {923588E5-66B8-4CF4-B799-8C20FF175A20}
+	EndGlobalSection
+EndGlobal
