@@ -50,20 +50,20 @@ namespace IPCheck
             String timestamp = DateTime.UtcNow.ToString("U");
             LastKnownIP = IniFileManager.IniReadValue("Address", "PublicIP");
 
+            postAddress = IniFileManager.IniReadValue("General", "PostAddress");
+            if (postAddress == "")
+            {
+                IniFileManager.IniWriteValue("General", "PostAddress", "");
+            }
+
             WebClient webc = new WebClient();
-            String webData = webc.DownloadString("http://checkip.dyndns.org/");
+            String webData = webc.DownloadString(postAddress);
             String ipaddress = (new Regex(@"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}")).Matches(webData)[0].ToString();
 
             userName = IniFileManager.IniReadValue("General", "User");
             if (userName == "")
             {
                 IniFileManager.IniWriteValue("General", "User", "");
-            }
-
-            postAddress = IniFileManager.IniReadValue("General", "PostAddress");
-            if (postAddress == "")
-            {
-                IniFileManager.IniWriteValue("General", "PostAddress", "");
             }
             
             String debugStr = IniFileManager.IniReadValue("General", "Debug");
