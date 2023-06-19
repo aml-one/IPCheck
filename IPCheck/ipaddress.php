@@ -17,6 +17,6 @@ if (isset($_GET["user"]) && isset($_GET["ip"]) && isset($_GET["timestamp"]))
 }
 else
 {
-  header("Location: http://google.com");
+  echo $_SERVER["REMOTE_ADDR"];
   die();
 }
