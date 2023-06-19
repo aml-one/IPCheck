@@ -30,16 +30,16 @@ namespace IPCheck
             timer.Interval = 120000; 
             timer.Enabled = true;
 
-            bool.TryParse(IniFileManager.IniReadValue("General", "Debug"), out Debug);
-            LastKnownIP = IniFileManager.IniReadValue("Address", "PublicIP");
+            bool.TryParse(IniFileManager.IniReadValue("General", "Debug"), out Debug);            
             if (Debug)
-                WriteToFile("[" + DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + "] START");
+                WriteToFile("[" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + "] START");
             GettingIPAddress(null, null);
         }
+
         protected override void OnStop()
         {       
             if (Debug)
-                WriteToFile("[" + DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + "] Service STOP");
+                WriteToFile("[" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + "] Service STOP");
         }
 
 
@@ -48,17 +48,12 @@ namespace IPCheck
             String userName;
             String postAddress;
             String example;
-            String timestamp = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds().ToString();
+            String timestamp = DateTime.UtcNow.ToString("U");
+            LastKnownIP = IniFileManager.IniReadValue("Address", "PublicIP");
 
             WebClient webc = new WebClient();
             String webData = webc.DownloadString("http://checkip.dyndns.org/");
             String ipaddress = (new Regex(@"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}")).Matches(webData)[0].ToString();
-
-            if (LastKnownIP != ipaddress)
-            {
-                LastKnownIP = ipaddress;
-                IniFileManager.IniWriteValue("Address", "PublicIP", ipaddress);
-            }
 
             userName = IniFileManager.IniReadValue("General", "User");
             if (userName == "")
@@ -87,14 +82,17 @@ namespace IPCheck
             }
 
             if (Debug)
-                WriteToFile("[" + DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + "] TASK perform");
+                WriteToFile("[" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + "] TASK perform");
                            
 
             try
             {
                 // sending ip + username to the selected address
-                if (userName != "" && postAddress != "")
+                if (userName != "" && postAddress != "" && LastKnownIP != ipaddress)
                 {
+                    LastKnownIP = ipaddress;
+                    IniFileManager.IniWriteValue("Address", "PublicIP", ipaddress);
+
                     using (var client = new WebClient())
                     {                        
                         client.Headers[HttpRequestHeader.ContentType] = "application/x-www-form-urlencoded";
@@ -102,8 +100,8 @@ namespace IPCheck
                         var result = client.UploadString(postAddress + "?ip=" + LastKnownIP + "&user=" + userName + "&timestamp=" + timestamp, "POST", data);
                         if (Debug)
                         {
-                            WriteToFile("[" + DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + "] POST to webaddress");
-                            WriteToFile("[" + DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + "] " + result);
+                            WriteToFile("[" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + "] POST to webaddress");
+                            WriteToFile("[" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + "] " + result);
                         }
                             
                     }
@@ -114,7 +112,7 @@ namespace IPCheck
                 if (Debug)
                 {
                     WriteToFile("link:" + postAddress + "?ip=" + LastKnownIP + "&user=" + userName + "&timestamp=" + timestamp);                    
-                    WriteToFile("[" + DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + "] ERROR - " + ex.Message.ToString());
+                    WriteToFile("[" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + "] ERROR - " + ex.Message.ToString());
                 }                    
             }
         }
