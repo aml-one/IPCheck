@@ -46,8 +46,7 @@ namespace IPCheck
         private void GettingIPAddress(object source, ElapsedEventArgs e)
         {
             String userName;
-            String postAddress;
-            String example;
+            String postAddress;            
             String timestamp = DateTime.UtcNow.ToString("U");
             LastKnownIP = IniFileManager.IniReadValue("Address", "PublicIP");
 
@@ -66,15 +65,7 @@ namespace IPCheck
             {
                 IniFileManager.IniWriteValue("General", "PostAddress", "");
             }
-
-            example = IniFileManager.IniReadValue("Examples", "PostAddress");
-            if (example == "")
-            {
-                IniFileManager.IniWriteValue("Examples", "User", "Carlos");
-                IniFileManager.IniWriteValue("Examples", "PostAddress", "http://ccdl.co/ipaddress.php");
-                IniFileManager.IniWriteValue("Examples", "-", "Final link will look like: <PostAddress>?ip=<IP>&user=<User>&timestamp=<posttimestamp>");
-            }
-
+            
             String debugStr = IniFileManager.IniReadValue("General", "Debug");
             if (debugStr == "")
             {
@@ -111,7 +102,7 @@ namespace IPCheck
             {
                 if (Debug)
                 {
-                    WriteToFile("link:" + postAddress + "?ip=" + LastKnownIP + "&user=" + userName + "&timestamp=" + timestamp);                    
+                    WriteToFile("Link:" + postAddress + "?ip=" + LastKnownIP + "&user=" + userName + "&timestamp=" + timestamp);                    
                     WriteToFile("[" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + "] ERROR - " + ex.Message.ToString());
                 }                    
             }
