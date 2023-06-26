@@ -1,10 +1,12 @@
 ﻿using System;
 using System.IO;
+using System.Web;
 using System.Net;
 using System.ServiceProcess;
 using System.Text.RegularExpressions;
 using System.Timers;
 using static IPCheck.Helper;
+using System.Linq;
 
 namespace IPCheck
 {
@@ -15,6 +17,7 @@ namespace IPCheck
         public static String LocalConfigFolderHelper = AppDomain.CurrentDomain.BaseDirectory;        
         public String LastKnownIP;
         public bool Debug = false;
+        private static Random random = new Random();
 
         public IPCheck()
         {
@@ -42,6 +45,20 @@ namespace IPCheck
                 WriteToFile("[" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + "] Service STOP");
         }
 
+
+        public static string RandomString(int length)
+        {
+            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxzy0123456789";
+            return new string(Enumerable.Repeat(chars, length)
+                .Select(s => s[random.Next(s.Length)]).ToArray());
+        }
+
+        public static string Reverse(string s)
+        {
+            char[] charArray = s.ToCharArray();
+            Array.Reverse(charArray);
+            return new string(charArray);
+        }
 
         private void GettingIPAddress(object source, ElapsedEventArgs e)
         {
@@ -83,16 +100,30 @@ namespace IPCheck
                 {
                     LastKnownIP = ipaddress;
                     IniFileManager.IniWriteValue("Address", "PublicIP", ipaddress);
+                    String json = "{\"user\":\"" + userName +"\", \"ip\":\"" + ipaddress +"\", \"timestamp\":\"" + timestamp +"\"}";
+
+                    byte[] encbuff = System.Text.Encoding.UTF8.GetBytes(json);
+                    String enc = Convert.ToBase64String(encbuff);
+                    String urlenc = HttpUtility.UrlEncode(enc);
+
+                    String dataPart1 = urlenc.Substring(0, 13);
+                    String dataPart2 = urlenc.Substring(13);
+                    String randomString = RandomString(13);
+                    String dhash = Reverse(dataPart1 + randomString + dataPart2);
+
+                    if (Debug)
+                        WriteToFile("[" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + "] HASH=" + dhash);
 
                     using (var client = new WebClient())
-                    {                        
+                    {
                         client.Headers[HttpRequestHeader.ContentType] = "application/x-www-form-urlencoded";
-                        var data = "";
-                        var result = client.UploadString(postAddress + "?ip=" + LastKnownIP + "&user=" + userName + "&timestamp=" + timestamp, "POST", data);
+                        var data = "hash=" + dhash;
+                        var result = client.UploadString(postAddress, "POST", data);                        
+
                         if (Debug)
                         {
                             WriteToFile("[" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + "] POST to webaddress");
-                            WriteToFile("[" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + "] " + result);
+                            WriteToFile("[" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + "] r! " + result);
                         }
                             
                     }
@@ -102,7 +133,6 @@ namespace IPCheck
             {
                 if (Debug)
                 {
-                    WriteToFile("Link:" + postAddress + "?ip=" + LastKnownIP + "&user=" + userName + "&timestamp=" + timestamp);                    
                     WriteToFile("[" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + "] ERROR - " + ex.Message.ToString());
                 }                    
             }
